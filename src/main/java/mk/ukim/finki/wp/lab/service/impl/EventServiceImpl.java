@@ -44,10 +44,9 @@ public class EventServiceImpl implements EventService {
     public Optional<Event> delete(Long id) {
         return eventRepository.delete(id);
     }
+
+    @Override
+    public Optional<Event> likeEvent(Long id) {
+        return eventRepository.getPoints(id);
+    }
 }
-//
-//
-//    public List<Event> searchEvents(String text) {
-//        return eventRepository.searchEvents(text);
-////    }
-//}

@@ -25,4 +25,8 @@ public class Event {
         this.popularityScore = popularityScore;
         this.location = location;
     }
+    public void incrementPopularityScore() {
+        this.popularityScore += 0.5;
+    }
+
 }

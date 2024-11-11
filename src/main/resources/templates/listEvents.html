@@ -16,11 +16,34 @@
 </header>
 <main>
   <script>
-    // JavaScript function to set the selected event name in the hidden input field
     function setEventName(eventName) {
       document.getElementById('hiddenEventName').value = eventName.getAttribute('data-event-name');
     }
+    function handleLike(eventId, button) {
+      button.disabled = true;
+      button.classList.add('liked-button');
+
+      localStorage.setItem(`liked-event-${eventId}`, 'true');
+
+      button.form.submit();
+    }
+
+    function initializeLikeButtons() {
+      document.querySelectorAll('button[id^="like-button-"]').forEach(button => {
+        const eventId = button.getAttribute('id').split('-')[2];
+        if (localStorage.getItem(`liked-event-${eventId}`) === 'true') {
+          button.disabled = true;
+          button.classList.add('liked-button');
+        }
+      });
+    }
+    document.addEventListener("DOMContentLoaded", initializeLikeButtons);
   </script>
+  <div>
+    <a href="/events/add">
+      Add new Event
+    </a>
+  </div>
   <form th:action="@{/events}" th:method="GET">
     <h3>Search Events</h3>
     <label for="searchText">Event Name:</label>
@@ -30,11 +53,6 @@
 
     <input type="submit" value="Search Events">
   </form>
-<div>
-  <a href="/events/add">
-    Add new Event
-  </a>
-</div>
 
   <form th:action="@{/}" th:method="GET">
     <h3>Search Bookings</h3>
@@ -42,12 +60,6 @@
     <input type="text" id="attendeeSearch" name="attendeeSearch">
     <input type="submit" value="Search Bookings">
   </form>
-  <!--    <a th:href="@{'/events/edit/{id}' (id=${event.getId()})}">-->
-  <!--      <button  name="eventName" style="display: inline-block">Edit Event</button>-->
-  <!--    </a>-->
-  <!--    <form th:method="POST" th:action="@{'/events/{id}/delete'(id=${event.id})}">-->
-  <!--      <input type="submit" value="Delete"/>-->
-  <!--    </form>-->
 
   <h2>Choose an event:</h2>
   <th:block th:each="event : ${events}">
@@ -57,7 +69,16 @@
     <form th:method="POST" style="display: inline-block" th:action="@{'/events/{id}/delete'(id=${event.id})}">
       <button type="submit">Delete</button>
     </form>
-      <label>
+    <form th:action="@{/events/{id}/like(id=${event.id})}" th:method="post" style="display:inline;">
+      <button
+              type="submit"
+              th:id="'like-button-' + ${event.id}"
+              th:onclick="'handleLike(' + ${event.id} + ', this); return false;'">
+        Like
+      </button>
+    </form>
+
+    <label>
         <input type="radio" name="eventName" th:value="${event.name}" required
                th:data-event-name="${event.name}" onclick="setEventName(this)">
         Name: <span th:text="${event.name}"></span>, Description: <span th:text="${event.description}"></span>,

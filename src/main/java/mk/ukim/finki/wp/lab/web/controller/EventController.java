@@ -104,6 +104,14 @@ public class EventController {
         eventService.delete(id);
         return "redirect:/events";
     }
+    @PostMapping("/{id}/like")
+    public String likeEvent(@PathVariable Long id) {
+        eventService.likeEvent(id);
+        return "redirect:/events";
+    }
+
+
+
 
 }
 

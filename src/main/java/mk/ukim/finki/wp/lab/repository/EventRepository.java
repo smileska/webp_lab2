@@ -68,4 +68,10 @@ public class EventRepository {
         events.removeIf(i->i.getId().equals(id));
         return Optional.of(event);
     }
+    public Optional<Event> getPoints(Long id) {
+        Optional<Event> eventOptional = findById(id);
+        eventOptional.ifPresent(Event::incrementPopularityScore);
+        return eventOptional;
+    }
+
 }

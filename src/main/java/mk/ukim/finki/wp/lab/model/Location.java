@@ -4,8 +4,6 @@ import lombok.Data;
 
 @Data
 public class Location {
-    //Ne znam do kaj ste na auditoriski kaj vas ama mozi i so
-    //@GeneratedValue(Strategy=Identity) ili taka nesto
     private Long id;
     private String name;
     private String address;
