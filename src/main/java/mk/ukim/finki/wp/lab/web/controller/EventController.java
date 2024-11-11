@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = {"/","/events"})
@@ -25,13 +26,30 @@ public class EventController {
     }
 
     @GetMapping
-    public String getEventsPage(@RequestParam(required = false) String error, Model model) {
-        List<Event> eventList = eventService.listAll();
+    public String getEventsPage(
+            @RequestParam(required = false) String searchText,
+            @RequestParam(required = false) Double minRating,
+            @RequestParam(required = false) String error,
+            Model model) {
+
+        List<Event> eventList;
+
+        if (searchText != null || minRating != null) {
+            eventList = eventService.searchEvents(searchText, minRating);
+        } else {
+            eventList = eventService.listAll();
+        }
+
+        model.addAttribute("searchText", searchText);
+        model.addAttribute("minRating", minRating);
+
         model.addAttribute("bookings", eventBookingService.getAllBookings());
         model.addAttribute("events", eventList);
         model.addAttribute("error", error);
         return "listEvents";
     }
+
+
 
     @GetMapping("/add")
     public String showAddEventForm(Model model) {
@@ -47,6 +65,22 @@ public class EventController {
         model.addAttribute("event", event);
         model.addAttribute("locations", locationService.findAll());
         return "addEvent";
+    }
+    @GetMapping("/edit/{eventId}")
+    public String editEvent(@PathVariable Long eventId, Model model) {
+        // Retrieve the event based on the ID
+        Optional<Event> eventOpt = eventService.findById(eventId);
+
+        if (eventOpt.isPresent()) {
+            Event event = eventOpt.get();
+            model.addAttribute("event", event);
+            model.addAttribute("locations", locationService.findAll()); // Provide locations for the dropdown
+            return "addEvent"; // This reuses the add-event.html form
+        } else {
+            // If no event found, redirect with an error message
+            model.addAttribute("error", "Event with the specified ID does not exist.");
+            return "redirect:/events";
+        }
     }
 
     @PostMapping("/save")
